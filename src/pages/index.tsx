@@ -28,11 +28,11 @@ export default function Home() {
 
   return (
     <>
+      <Toaster />
       <Head>
         <title>Words | Home</title>
       </Head>
       <main className="p-5 w-5/12 max-xl:w-8/12 my-0 mx-auto">
-        <Toaster />
         <NewWordForm
           isOpen={formModal}
           updateWords={mutate}
