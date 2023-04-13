@@ -42,9 +42,10 @@ export default async function handler(
       await fs.writeFile(filePath + "/words.json", JSON.stringify(data));
       res.status(201).json({ error: false });
     } catch (error) {
-      res
-        .status(400)
-        .json({ error: true, message: "No se pudo agregar la palabra" });
+      res.status(400).json({
+        error: true,
+        message: "No se pudo agregar la palabra" + error,
+      });
     }
   }
 }
