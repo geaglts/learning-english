@@ -32,7 +32,7 @@ export default async function handler(
       const { english, spanish } = req.body;
       const status = await prisma.word.create({ data: { english, spanish } });
       if (status.id) {
-        res.json({ error: false });
+        return res.json({ error: false });
       }
       res.json({ error: true });
     } catch (error) {
