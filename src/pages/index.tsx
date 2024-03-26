@@ -6,6 +6,7 @@ import { NewWordForm } from "@/components/NewWordForm";
 import { wordsService } from "@/services/words.service";
 import type { FormEvent } from "react";
 import type { Response, Word } from "./api/words";
+import { Loading } from "@/components/Loading";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -23,8 +24,7 @@ export default function Home() {
     setFormModal(!formModal);
   };
 
-  if (isLoading) return null;
-  if (!data?.data) return null;
+  if (isLoading) return <Loading />;
 
   return (
     <>
@@ -41,11 +41,14 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-center">Palabras en Inglés</h1>
         <SearchBar onChangeInput={onChangeInput} onToggle={onToggle} />
         <section className="flex flex-col gap-4 ">
-          {data?.data
-            .filter(wordsService.filterWords(searchValue))
-            .map((word: Word) => {
-              return <WordCard key={`Home_WordCard_${word.id}`} data={word} />;
-            })}
+          {data?.data &&
+            data?.data
+              .filter(wordsService.filterWords(searchValue))
+              .map((word: Word) => {
+                return (
+                  <WordCard key={`Home_WordCard_${word.id}`} data={word} />
+                );
+              })}
         </section>
       </main>
     </>
