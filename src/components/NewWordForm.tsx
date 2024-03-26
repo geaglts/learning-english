@@ -4,6 +4,7 @@ import axios from "axios";
 import { Modal } from "./Modal";
 import type { FormEvent } from "react";
 import type { Response } from "../pages/api/words";
+import { wordsService } from "@/services/words.service";
 
 type NewWordFormProps = {
   isOpen: boolean;
@@ -23,18 +24,7 @@ export function NewWordForm({
     const data = Object.fromEntries(
       new FormData(formRef.current as HTMLFormElement)
     );
-    for (let key in data) {
-      if (!data[key]) {
-        toast.error("Todos los campos son requeridos");
-        return;
-      }
-    }
-    const response = await axios.post<Response>("/api/words", data);
-    if (response.data.error) {
-      toast.error(response.data.message);
-      return;
-    }
-    toast.success("Palabra agregada correctamente");
+    await wordsService.add(data);
     formRef.current?.reset();
     updateWords();
   };

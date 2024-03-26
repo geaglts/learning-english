@@ -1,12 +1,11 @@
 import { useState } from "react";
 import Head from "next/head";
 import useSWR from "swr";
-import { Toaster } from "sonner";
+import { Toaster, toast } from "sonner";
 import { NewWordForm } from "@/components/NewWordForm";
 import { wordsService } from "@/services/words.service";
 import type { FormEvent } from "react";
 import type { Response, Word } from "./api/words";
-import { Loading } from "@/components/Loading";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -24,6 +23,27 @@ export default function Home() {
     setFormModal(!formModal);
   };
 
+  const onSubmitSearchBar = async (evt: FormEvent) => {
+    evt.preventDefault();
+    if (data && data.data) {
+      const foundItems = data?.data.filter(
+        wordsService.filterWords(searchValue)
+      ).length;
+      if (foundItems === 0) {
+        const [english, spanish] = searchValue.split("@");
+        if (!english || !spanish) {
+          toast(
+            "Por favor, recuerda que para agregar una palabra necesita estar separada por un @"
+          );
+        } else {
+          await wordsService.add({ english, spanish });
+          setSearchValue("");
+          mutate();
+        }
+      }
+    }
+  };
+
   return (
     <>
       <Toaster />
@@ -37,7 +57,12 @@ export default function Home() {
           onToggle={onToggle}
         />
         <h1 className="text-4xl font-bold text-center">Palabras en Inglés</h1>
-        <SearchBar onChangeInput={onChangeInput} onToggle={onToggle} />
+        <SearchBar
+          onChangeInput={onChangeInput}
+          onToggle={onToggle}
+          searchValue={searchValue}
+          onSubmitForm={onSubmitSearchBar}
+        />
         <section className="flex flex-col gap-4 ">
           {isLoading &&
             new Array(3)
@@ -75,24 +100,33 @@ function WordCard({ data }: WordCardProps) {
 type SearchBarProps = {
   onChangeInput: (evt: FormEvent<HTMLInputElement>) => void;
   onToggle: () => void;
+  onSubmitForm: (evt: FormEvent) => void;
+  searchValue: string;
 };
 
-function SearchBar({ onChangeInput, onToggle }: SearchBarProps) {
+function SearchBar({
+  onChangeInput,
+  onToggle,
+  searchValue,
+  onSubmitForm,
+}: SearchBarProps) {
   return (
-    <section className="flex items-center">
+    <form className="flex items-center" onSubmit={onSubmitForm}>
       <input
         className="w-full p-4 rounded-md my-5 text-slate-800 font-bold"
         type="text"
         placeholder="buscar..."
         onChange={onChangeInput}
+        value={searchValue}
       />
       <button
+        type="button"
         className="bg-blue-700 p-4 rounded-md font-bold ml-3"
         onClick={onToggle}
       >
         Agregar
       </button>
-    </section>
+    </form>
   );
 }
 
