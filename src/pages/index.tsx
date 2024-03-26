@@ -24,8 +24,6 @@ export default function Home() {
     setFormModal(!formModal);
   };
 
-  if (isLoading) return <Loading />;
-
   return (
     <>
       <Toaster />
@@ -41,6 +39,12 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-center">Palabras en Inglés</h1>
         <SearchBar onChangeInput={onChangeInput} onToggle={onToggle} />
         <section className="flex flex-col gap-4 ">
+          {isLoading &&
+            new Array(3)
+              .fill(0)
+              .map((v, i) => (
+                <WordCardSkeleton key={`Home_WordCardSkeleton_${i}`} />
+              ))}
           {data?.data &&
             data?.data
               .filter(wordsService.filterWords(searchValue))
@@ -89,5 +93,14 @@ function SearchBar({ onChangeInput, onToggle }: SearchBarProps) {
         Agregar
       </button>
     </section>
+  );
+}
+
+function WordCardSkeleton() {
+  return (
+    <div className="animate-pulse bg-gray-700 rounded-md p-4">
+      <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+      <div className="mt-2 h-5 bg-gray-200 rounded w-1/2"></div>
+    </div>
   );
 }
